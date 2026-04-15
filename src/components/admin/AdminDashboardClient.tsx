@@ -126,12 +126,12 @@ export default function AdminDashboardClient({
           <h1 className="text-2xl font-bold text-white" style={{ fontFamily: 'Syne, sans-serif' }}>
             Dashboard Admin
           </h1>
-          <p className="text-sm mt-1" style={{ color: '#a0a0a0' }}>
+          <p className="text-sm mt-1" style={{ color: '#6b6860' }}>
             Vue globale de l'équipe montage · {year}
           </p>
         </div>
         {/* Quarter selector */}
-        <div className="flex gap-1 p-1 rounded-xl" style={{ background: '#161616', border: '1px solid #2a2a2a' }}>
+        <div className="flex gap-1 p-1 rounded-xl" style={{ background: '#ffffff', border: '1px solid #2a2a2a' }}>
           {[1, 2, 3, 4].map(q => (
             <button
               key={q}
@@ -140,7 +140,7 @@ export default function AdminDashboardClient({
               style={{
                 fontFamily: 'Syne, sans-serif',
                 background: selectedQuarter === q ? '#e63329' : 'transparent',
-                color: selectedQuarter === q ? 'white' : '#5a5a5a',
+                color: selectedQuarter === q ? 'white' : '#a09d96',
               }}
             >
               Q{q}
@@ -150,7 +150,7 @@ export default function AdminDashboardClient({
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 border-b" style={{ borderColor: '#2a2a2a' }}>
+      <div className="flex gap-1 border-b" style={{ borderColor: '#e0ddd6' }}>
         {([
           { id: 'overview', label: 'Vue équipe' },
           { id: 'calendar', label: 'Calendrier global' },
@@ -163,7 +163,7 @@ export default function AdminDashboardClient({
             style={{
               fontFamily: 'Syne, sans-serif',
               borderBottomColor: selectedTab === tab.id ? '#e63329' : 'transparent',
-              color: selectedTab === tab.id ? '#f5f5f5' : '#5a5a5a',
+              color: selectedTab === tab.id ? '#1a1a1a' : '#a09d96',
             }}
           >
             {tab.label}
@@ -197,10 +197,10 @@ export default function AdminDashboardClient({
 
                   {/* Name */}
                   <div className="w-32">
-                    <p className="font-bold text-sm" style={{ fontFamily: 'Syne, sans-serif', color: '#f5f5f5' }}>
+                    <p className="font-bold text-sm" style={{ fontFamily: 'Syne, sans-serif', color: '#1a1a1a' }}>
                       {editor.name.split(' ')[0]}
                     </p>
-                    <p className="text-xs" style={{ color: '#5a5a5a' }}>{editor.email.split('@')[0]}</p>
+                    <p className="text-xs" style={{ color: '#a09d96' }}>{editor.email.split('@')[0]}</p>
                   </div>
 
                   {/* Availabilities pills */}
@@ -225,7 +225,7 @@ export default function AdminDashboardClient({
                   {/* Progress */}
                   <div className="flex-1 mx-4">
                     <div className="flex items-center justify-between mb-1.5">
-                      <span className="text-xs" style={{ color: '#5a5a5a' }}>
+                      <span className="text-xs" style={{ color: '#a09d96' }}>
                         {stats.actual} / {stats.target} concepts
                       </span>
                       <span
@@ -247,15 +247,15 @@ export default function AdminDashboardClient({
                   <div className="w-28 text-right">
                     {variable ? (
                       <div>
-                        <p className="text-sm font-bold" style={{ fontFamily: 'Syne, sans-serif', color: '#f5f5f5' }}>
+                        <p className="text-sm font-bold" style={{ fontFamily: 'Syne, sans-serif', color: '#1a1a1a' }}>
                           {formatCurrency(variable.bonus_amount)}
                         </p>
-                        <p className="text-xs" style={{ color: '#5a5a5a' }}>
+                        <p className="text-xs" style={{ color: '#a09d96' }}>
                           sur {formatCurrency(variable.base_bonus)}
                         </p>
                       </div>
                     ) : (
-                      <span className="text-xs" style={{ color: '#3a3a3a' }}>—</span>
+                      <span className="text-xs" style={{ color: '#ccc9c0' }}>—</span>
                     )}
                   </div>
                 </div>
@@ -269,8 +269,8 @@ export default function AdminDashboardClient({
       {selectedTab === 'calendar' && (
         <div className="space-y-4">
           <div className="card rounded-2xl overflow-hidden">
-            <div className="px-6 py-4 border-b" style={{ borderColor: '#2a2a2a' }}>
-              <h2 className="font-bold" style={{ fontFamily: 'Syne, sans-serif', color: '#f5f5f5' }}>
+            <div className="px-6 py-4 border-b" style={{ borderColor: '#e0ddd6' }}>
+              <h2 className="font-bold" style={{ fontFamily: 'Syne, sans-serif', color: '#1a1a1a' }}>
                 Disponibilités — {format(today, 'MMMM yyyy', { locale: fr })}
               </h2>
             </div>
@@ -286,7 +286,7 @@ export default function AdminDashboardClient({
                   return (
                     <div key={editor.id} className="flex items-center gap-3">
                       <div className="w-20 flex-shrink-0">
-                        <p className="text-xs font-medium" style={{ fontFamily: 'Syne, sans-serif', color: '#a0a0a0' }}>
+                        <p className="text-xs font-medium" style={{ fontFamily: 'Syne, sans-serif', color: '#6b6860' }}>
                           {editor.name.split(' ')[0]}
                         </p>
                       </div>
@@ -308,12 +308,12 @@ export default function AdminDashboardClient({
                                 minWidth: '20px',
                                 background: avail
                                   ? avail.type === 'cours' ? 'rgba(59,130,246,0.35)' : avail.type === 'tournage' ? 'rgba(249,115,22,0.35)' : 'rgba(16,185,129,0.35)'
-                                  : isWeekend || isHoliday ? '#111111' : '#1e1e1e',
+                                  : isWeekend || isHoliday ? '#f9f8f5' : '#edeae3',
                                 border: isToday ? '1px solid #e63329' : 'none',
                               }}
                               title={avail ? `${day} — ${AVAILABILITY_CONFIG[avail.type].label}` : `${day}`}
                             >
-                              <span className="text-xs" style={{ color: '#3a3a3a', fontSize: '0.6rem' }}>
+                              <span className="text-xs" style={{ color: '#ccc9c0', fontSize: '0.6rem' }}>
                                 {avail ? AVAILABILITY_CONFIG[avail.type].emoji : ''}
                               </span>
                             </div>
@@ -325,15 +325,15 @@ export default function AdminDashboardClient({
                 })}
               </div>
 
-              <div className="flex gap-4 mt-4 pt-4 border-t" style={{ borderColor: '#1e1e1e' }}>
+              <div className="flex gap-4 mt-4 pt-4 border-t" style={{ borderColor: '#edeae3' }}>
                 {Object.entries(AVAILABILITY_CONFIG).map(([key, config]) => (
-                  <div key={key} className="flex items-center gap-1.5 text-xs" style={{ color: '#5a5a5a' }}>
+                  <div key={key} className="flex items-center gap-1.5 text-xs" style={{ color: '#a09d96' }}>
                     <span>{config.emoji}</span>
                     <span>{config.label}</span>
                   </div>
                 ))}
-                <div className="flex items-center gap-1.5 text-xs ml-4" style={{ color: '#5a5a5a' }}>
-                  <div className="w-3 h-3 rounded-sm" style={{ background: '#1e1e1e' }} />
+                <div className="flex items-center gap-1.5 text-xs ml-4" style={{ color: '#a09d96' }}>
+                  <div className="w-3 h-3 rounded-sm" style={{ background: '#edeae3' }} />
                   <span>Disponible</span>
                 </div>
               </div>
@@ -349,10 +349,10 @@ export default function AdminDashboardClient({
           <div className="card rounded-2xl p-5">
             <div className="flex items-center justify-between mb-4">
               <div>
-                <h3 className="font-bold" style={{ fontFamily: 'Syne, sans-serif', color: '#f5f5f5' }}>
+                <h3 className="font-bold" style={{ fontFamily: 'Syne, sans-serif', color: '#1a1a1a' }}>
                   Lien d'évaluation CS — Q{selectedQuarter} {year}
                 </h3>
-                <p className="text-xs mt-1" style={{ color: '#5a5a5a' }}>
+                <p className="text-xs mt-1" style={{ color: '#a09d96' }}>
                   Envoie ce lien à tes Creative Strategists pour qu'ils évaluent les monteurs
                 </p>
               </div>
@@ -365,8 +365,8 @@ export default function AdminDashboardClient({
             </div>
 
             {evalUrl && (
-              <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#111111', border: '1px solid #2a2a2a' }}>
-                <span className="text-xs flex-1 truncate" style={{ color: '#a0a0a0', fontFamily: 'monospace' }}>
+              <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#f9f8f5', border: '1px solid #2a2a2a' }}>
+                <span className="text-xs flex-1 truncate" style={{ color: '#6b6860', fontFamily: 'monospace' }}>
                   {evalUrl}
                 </span>
                 <button onClick={copyLink} className="btn-secondary flex items-center gap-1.5 text-xs py-1.5">
@@ -383,13 +383,13 @@ export default function AdminDashboardClient({
 
           {/* Bonus table */}
           <div className="card rounded-2xl overflow-hidden">
-            <div className="px-6 py-4 border-b" style={{ borderColor: '#2a2a2a' }}>
-              <h3 className="font-bold" style={{ fontFamily: 'Syne, sans-serif', color: '#f5f5f5' }}>
+            <div className="px-6 py-4 border-b" style={{ borderColor: '#e0ddd6' }}>
+              <h3 className="font-bold" style={{ fontFamily: 'Syne, sans-serif', color: '#1a1a1a' }}>
                 Variables trimestrielles — Q{selectedQuarter} {year}
               </h3>
             </div>
 
-            <div className="divide-y" style={{ borderColor: '#1e1e1e' }}>
+            <div className="divide-y" style={{ borderColor: '#edeae3' }}>
               {editors.map(editor => {
                 const stats = getEditorQuarterStats(editor.id, selectedQuarter)
                 const variable = getVariable(editor.id)
@@ -406,7 +406,7 @@ export default function AdminDashboardClient({
                     </div>
 
                     <div className="w-28">
-                      <p className="text-sm font-medium" style={{ fontFamily: 'Syne, sans-serif', color: '#f5f5f5' }}>
+                      <p className="text-sm font-medium" style={{ fontFamily: 'Syne, sans-serif', color: '#1a1a1a' }}>
                         {editor.name.split(' ')[0]}
                       </p>
                     </div>
@@ -418,12 +418,12 @@ export default function AdminDashboardClient({
                       >
                         {stats.rate}%
                       </span>
-                      <p className="text-xs" style={{ color: '#5a5a5a' }}>taux Q{selectedQuarter}</p>
+                      <p className="text-xs" style={{ color: '#a09d96' }}>taux Q{selectedQuarter}</p>
                     </div>
 
                     {/* Bonus de base */}
                     <div className="flex items-center gap-2 flex-1">
-                      <span className="text-xs" style={{ color: '#5a5a5a' }}>Bonus base :</span>
+                      <span className="text-xs" style={{ color: '#a09d96' }}>Bonus base :</span>
                       {editingBonus === editor.id ? (
                         <div className="flex items-center gap-1">
                           <input
@@ -434,7 +434,7 @@ export default function AdminDashboardClient({
                             placeholder="0"
                             autoFocus
                           />
-                          <span className="text-xs" style={{ color: '#5a5a5a' }}>€</span>
+                          <span className="text-xs" style={{ color: '#a09d96' }}>€</span>
                           <button onClick={() => saveBaseBonus(editor.id)} className="p-1" style={{ color: '#10b981' }}>
                             <Check size={12} />
                           </button>
@@ -444,7 +444,7 @@ export default function AdminDashboardClient({
                         </div>
                       ) : (
                         <div className="flex items-center gap-1 group">
-                          <span className="text-sm font-medium" style={{ color: '#f5f5f5' }}>
+                          <span className="text-sm font-medium" style={{ color: '#1a1a1a' }}>
                             {formatCurrency(baseBonus)}
                           </span>
                           <button
@@ -453,7 +453,7 @@ export default function AdminDashboardClient({
                               setBonusValue(String(baseBonus))
                             }}
                             className="opacity-0 group-hover:opacity-100 p-0.5 rounded transition-opacity"
-                            style={{ color: '#5a5a5a' }}
+                            style={{ color: '#a09d96' }}
                           >
                             <Edit2 size={10} />
                           </button>
@@ -463,10 +463,10 @@ export default function AdminDashboardClient({
 
                     {/* Bonus calculé */}
                     <div className="w-36 text-right">
-                      <p className="text-sm font-bold" style={{ fontFamily: 'Syne, sans-serif', color: '#f5f5f5' }}>
+                      <p className="text-sm font-bold" style={{ fontFamily: 'Syne, sans-serif', color: '#1a1a1a' }}>
                         {formatCurrency(bonus)}
                       </p>
-                      <p className="text-xs" style={{ color: '#5a5a5a' }}>bonus calculé</p>
+                      <p className="text-xs" style={{ color: '#a09d96' }}>bonus calculé</p>
                     </div>
                   </div>
                 )
@@ -474,9 +474,9 @@ export default function AdminDashboardClient({
             </div>
 
             {/* Bonus scale legend */}
-            <div className="px-6 py-4 border-t" style={{ borderColor: '#1e1e1e', background: '#111111' }}>
-              <p className="text-xs mb-2" style={{ color: '#5a5a5a' }}>Barème de la variable :</p>
-              <div className="flex gap-4 text-xs" style={{ color: '#5a5a5a' }}>
+            <div className="px-6 py-4 border-t" style={{ borderColor: '#edeae3', background: '#f9f8f5' }}>
+              <p className="text-xs mb-2" style={{ color: '#a09d96' }}>Barème de la variable :</p>
+              <div className="flex gap-4 text-xs" style={{ color: '#a09d96' }}>
                 <span>≥ 100% → 100%</span>
                 <span>≥ 90% → 90%</span>
                 <span>≥ 75% → 75%</span>

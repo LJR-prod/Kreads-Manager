@@ -45,7 +45,7 @@ function StarRating({ value, onChange }: { value: number; onChange: (v: number) 
             <Star
               size={22}
               fill={active ? '#f59e0b' : 'none'}
-              stroke={active ? '#f59e0b' : '#3a3a3a'}
+              stroke={active ? '#f59e0b' : '#ccc9c0'}
             />
           </button>
         )
@@ -121,20 +121,20 @@ export default function EvaluationFormClient({ link, editors }: EvaluationFormCl
 
   if (submitted) {
     return (
-      <div className="min-h-screen flex items-center justify-center" style={{ background: '#080808' }}>
+      <div className="min-h-screen flex items-center justify-center" style={{ background: '#f5f3ee' }}>
         <div className="text-center space-y-4">
           <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto" style={{ background: 'rgba(16,185,129,0.15)' }}>
             <CheckCircle size={32} style={{ color: '#10b981' }} />
           </div>
-          <h1 className="text-2xl font-bold" style={{ fontFamily: 'Syne, sans-serif', color: '#f5f5f5' }}>
+          <h1 className="text-2xl font-bold" style={{ fontFamily: 'Syne, sans-serif', color: '#1a1a1a' }}>
             Merci {csName} !
           </h1>
-          <p className="text-sm" style={{ color: '#a0a0a0' }}>
+          <p className="text-sm" style={{ color: '#6b6860' }}>
             Tes évaluations ont bien été envoyées pour le Q{link.quarter} {link.year}.
           </p>
           <div
             className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs"
-            style={{ background: '#161616', color: '#5a5a5a', border: '1px solid #2a2a2a' }}
+            style={{ background: '#ffffff', color: '#a09d96', border: '1px solid #2a2a2a' }}
           >
             <span style={{ color: '#e63329', fontFamily: 'Syne, sans-serif', fontWeight: 700 }}>K</span>
             Kreads Manager
@@ -145,7 +145,7 @@ export default function EvaluationFormClient({ link, editors }: EvaluationFormCl
   }
 
   return (
-    <div className="min-h-screen py-12 px-4" style={{ background: '#080808' }}>
+    <div className="min-h-screen py-12 px-4" style={{ background: '#f5f3ee' }}>
       <div
         className="absolute inset-0 opacity-[0.03]"
         style={{
@@ -161,12 +161,12 @@ export default function EvaluationFormClient({ link, editors }: EvaluationFormCl
             <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: '#e63329' }}>
               <span className="text-white font-bold text-xs" style={{ fontFamily: 'Syne, sans-serif' }}>K</span>
             </div>
-            <span className="font-bold" style={{ fontFamily: 'Syne, sans-serif', color: '#f5f5f5' }}>Kreads Manager</span>
+            <span className="font-bold" style={{ fontFamily: 'Syne, sans-serif', color: '#1a1a1a' }}>Kreads Manager</span>
           </div>
           <h1 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'Syne, sans-serif' }}>
             Évaluation des monteurs
           </h1>
-          <p className="text-sm" style={{ color: '#a0a0a0' }}>
+          <p className="text-sm" style={{ color: '#6b6860' }}>
             Q{link.quarter} {link.year} · Note uniquement les monteurs avec qui tu as travaillé
           </p>
         </div>
@@ -187,14 +187,14 @@ export default function EvaluationFormClient({ link, editors }: EvaluationFormCl
         {evals.map((ev, index) => (
           <div key={index} className="card rounded-2xl overflow-hidden">
             {/* Editor selector */}
-            <div className="px-5 pt-5 pb-4 border-b flex items-center justify-between" style={{ borderColor: '#2a2a2a' }}>
+            <div className="px-5 pt-5 pb-4 border-b flex items-center justify-between" style={{ borderColor: '#e0ddd6' }}>
               <div className="flex-1 mr-4">
                 <label className="label">Monteur *</label>
                 <select
                   className="input"
                   value={ev.editor_id}
                   onChange={e => updateEval(index, 'editor_id', e.target.value)}
-                  style={{ background: '#111111', cursor: 'pointer' }}
+                  style={{ background: '#f9f8f5', cursor: 'pointer' }}
                 >
                   <option value="">Sélectionner un monteur</option>
                   {editors.map(e => (
@@ -206,9 +206,9 @@ export default function EvaluationFormClient({ link, editors }: EvaluationFormCl
                 <button
                   onClick={() => removeEditor(index)}
                   className="p-2 rounded-lg transition-all mt-5"
-                  style={{ color: '#5a5a5a', background: '#111111' }}
+                  style={{ color: '#a09d96', background: '#f9f8f5' }}
                   onMouseEnter={e => (e.currentTarget.style.color = '#ef4444')}
-                  onMouseLeave={e => (e.currentTarget.style.color = '#5a5a5a')}
+                  onMouseLeave={e => (e.currentTarget.style.color = '#a09d96')}
                 >
                   <Trash2 size={14} />
                 </button>
@@ -221,8 +221,8 @@ export default function EvaluationFormClient({ link, editors }: EvaluationFormCl
                 <div key={c.key}>
                   <div className="flex items-start justify-between mb-2">
                     <div>
-                      <p className="text-sm font-medium" style={{ color: '#f5f5f5' }}>{c.label}</p>
-                      <p className="text-xs mt-0.5" style={{ color: '#5a5a5a' }}>{c.desc}</p>
+                      <p className="text-sm font-medium" style={{ color: '#1a1a1a' }}>{c.label}</p>
+                      <p className="text-xs mt-0.5" style={{ color: '#a09d96' }}>{c.desc}</p>
                     </div>
                   </div>
                   <StarRating
@@ -251,14 +251,14 @@ export default function EvaluationFormClient({ link, editors }: EvaluationFormCl
         <button
           onClick={addEditor}
           className="w-full py-3 rounded-2xl border-2 border-dashed flex items-center justify-center gap-2 text-sm transition-all duration-200"
-          style={{ borderColor: '#2a2a2a', color: '#5a5a5a' }}
+          style={{ borderColor: '#e0ddd6', color: '#a09d96' }}
           onMouseEnter={e => {
             (e.currentTarget as HTMLButtonElement).style.borderColor = '#e63329'
             ;(e.currentTarget as HTMLButtonElement).style.color = '#e63329'
           }}
           onMouseLeave={e => {
             ;(e.currentTarget as HTMLButtonElement).style.borderColor = '#2a2a2a'
-            ;(e.currentTarget as HTMLButtonElement).style.color = '#5a5a5a'
+            ;(e.currentTarget as HTMLButtonElement).style.color = '#a09d96'
           }}
         >
           <Plus size={14} />
@@ -287,7 +287,7 @@ export default function EvaluationFormClient({ link, editors }: EvaluationFormCl
           {loading ? 'Envoi...' : 'Envoyer mes évaluations'}
         </button>
 
-        <p className="text-center text-xs pb-8" style={{ color: '#3a3a3a' }}>
+        <p className="text-center text-xs pb-8" style={{ color: '#ccc9c0' }}>
           © {new Date().getFullYear()} Kreads · Formulaire confidentiel
         </p>
       </div>

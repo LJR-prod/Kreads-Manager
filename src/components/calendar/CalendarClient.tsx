@@ -123,21 +123,21 @@ export default function CalendarClient({ profile, initialAvailabilities, holiday
           <h1 className="text-2xl font-bold text-white" style={{ fontFamily: 'Syne, sans-serif' }}>
             Mes disponibilités
           </h1>
-          <p className="text-sm mt-1" style={{ color: '#a0a0a0' }}>
+          <p className="text-sm mt-1" style={{ color: '#6b6860' }}>
             Clique sur un jour pour marquer ta disponibilité
           </p>
         </div>
         <button
           onClick={clearMonth}
           className="flex items-center gap-2 text-xs px-3 py-2 rounded-lg border transition-all duration-200"
-          style={{ color: '#5a5a5a', borderColor: '#2a2a2a', background: 'transparent' }}
+          style={{ color: '#a09d96', borderColor: '#e0ddd6', background: 'transparent' }}
           onMouseEnter={e => {
             (e.currentTarget as HTMLButtonElement).style.color = '#ef4444'
             ;(e.currentTarget as HTMLButtonElement).style.borderColor = '#ef4444'
           }}
           onMouseLeave={e => {
-            ;(e.currentTarget as HTMLButtonElement).style.color = '#5a5a5a'
-            ;(e.currentTarget as HTMLButtonElement).style.borderColor = '#2a2a2a'
+            ;(e.currentTarget as HTMLButtonElement).style.color = '#a09d96'
+            ;(e.currentTarget as HTMLButtonElement).style.borderColor = '#e0ddd6'
           }}
         >
           <Trash2 size={12} />
@@ -163,13 +163,13 @@ export default function CalendarClient({ profile, initialAvailabilities, holiday
               style={{
                 background: isSelected
                   ? type === 'cours' ? 'rgba(59,130,246,0.2)' : type === 'tournage' ? 'rgba(249,115,22,0.2)' : 'rgba(16,185,129,0.2)'
-                  : '#161616',
+                  : '#ffffff',
                 borderColor: isSelected
                   ? type === 'cours' ? 'rgba(59,130,246,0.5)' : type === 'tournage' ? 'rgba(249,115,22,0.5)' : 'rgba(16,185,129,0.5)'
-                  : '#2a2a2a',
+                  : '#e0ddd6',
                 color: isSelected
                   ? type === 'cours' ? '#93c5fd' : type === 'tournage' ? '#fdba74' : '#6ee7b7'
-                  : '#a0a0a0',
+                  : '#6b6860',
               }}
             >
               <span>{config.emoji}</span>
@@ -193,33 +193,33 @@ export default function CalendarClient({ profile, initialAvailabilities, holiday
       {/* Calendar */}
       <div className="card rounded-2xl overflow-hidden">
         {/* Nav */}
-        <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: '#2a2a2a' }}>
+        <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: '#e0ddd6' }}>
           <button
             onClick={() => setCurrentDate(subMonths(currentDate, 1))}
             className="p-2 rounded-lg transition-all duration-200 hover:bg-[#1c1c1c]"
-            style={{ color: '#a0a0a0' }}
+            style={{ color: '#6b6860' }}
           >
             <ChevronLeft size={16} />
           </button>
-          <h2 className="font-bold capitalize" style={{ fontFamily: 'Syne, sans-serif', color: '#f5f5f5' }}>
+          <h2 className="font-bold capitalize" style={{ fontFamily: 'Syne, sans-serif', color: '#1a1a1a' }}>
             {format(currentDate, 'MMMM yyyy', { locale: fr })}
           </h2>
           <button
             onClick={() => setCurrentDate(addMonths(currentDate, 1))}
             className="p-2 rounded-lg transition-all duration-200 hover:bg-[#1c1c1c]"
-            style={{ color: '#a0a0a0' }}
+            style={{ color: '#6b6860' }}
           >
             <ChevronRight size={16} />
           </button>
         </div>
 
         {/* Day headers */}
-        <div className="grid grid-cols-7 border-b" style={{ borderColor: '#2a2a2a' }}>
+        <div className="grid grid-cols-7 border-b" style={{ borderColor: '#e0ddd6' }}>
           {['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'].map(day => (
             <div
               key={day}
               className="text-center py-3 text-xs font-medium uppercase tracking-wider"
-              style={{ color: '#5a5a5a', fontFamily: 'Syne, sans-serif' }}
+              style={{ color: '#a09d96', fontFamily: 'Syne, sans-serif' }}
             >
               {day}
             </div>
@@ -230,7 +230,7 @@ export default function CalendarClient({ profile, initialAvailabilities, holiday
         <div className="grid grid-cols-7">
           {paddedDays.map((day, idx) => {
             if (!day) {
-              return <div key={`pad-${idx}`} className="aspect-square border-b border-r" style={{ borderColor: '#1a1a1a' }} />
+              return <div key={`pad-${idx}`} className="aspect-square border-b border-r" style={{ borderColor: '#e0ddd6' }} />
             }
 
             const dateStr = format(day, 'yyyy-MM-dd')
@@ -253,7 +253,7 @@ export default function CalendarClient({ profile, initialAvailabilities, holiday
                   isDisabled && 'opacity-30',
                 )}
                 style={{
-                  borderColor: '#1a1a1a',
+                  borderColor: '#e0ddd6',
                   background: avail
                     ? avail.type === 'cours' ? 'rgba(59,130,246,0.12)' : avail.type === 'tournage' ? 'rgba(249,115,22,0.12)' : 'rgba(16,185,129,0.12)'
                     : undefined,
@@ -281,7 +281,7 @@ export default function CalendarClient({ profile, initialAvailabilities, holiday
                   className="text-sm font-medium"
                   style={{
                     fontFamily: 'Syne, sans-serif',
-                    color: isTodayDay ? '#e63329' : isDisabled ? '#3a3a3a' : '#f5f5f5',
+                    color: isTodayDay ? '#e63329' : isDisabled ? '#ccc9c0' : '#1a1a1a',
                   }}
                 >
                   {format(day, 'd')}
@@ -294,7 +294,7 @@ export default function CalendarClient({ profile, initialAvailabilities, holiday
                 )}
 
                 {isHoliday && (
-                  <span style={{ fontSize: '0.55rem', color: '#5a5a5a', marginTop: 2 }}>férié</span>
+                  <span style={{ fontSize: '0.55rem', color: '#a09d96', marginTop: 2 }}>férié</span>
                 )}
               </div>
             )
@@ -303,7 +303,7 @@ export default function CalendarClient({ profile, initialAvailabilities, holiday
       </div>
 
       {/* Legend + info */}
-      <div className="flex items-center gap-6 text-xs" style={{ color: '#5a5a5a' }}>
+      <div className="flex items-center gap-6 text-xs" style={{ color: '#a09d96' }}>
         <div className="flex items-center gap-1.5">
           <Info size={11} />
           <span>Cliquer sur un jour marqué avec le même type le supprime</span>

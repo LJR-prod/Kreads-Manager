@@ -127,12 +127,12 @@ export default function ObjectivesClient({
           <h1 className="text-2xl font-bold text-white" style={{ fontFamily: 'Syne, sans-serif' }}>
             Objectifs {year}
           </h1>
-          <p className="text-sm mt-1" style={{ color: '#a0a0a0' }}>
+          <p className="text-sm mt-1" style={{ color: '#6b6860' }}>
             5 concepts par jour travaillé · hors WE, fériés et cours
           </p>
         </div>
         {syncing && (
-          <div className="flex items-center gap-2 text-xs" style={{ color: '#5a5a5a' }}>
+          <div className="flex items-center gap-2 text-xs" style={{ color: '#a09d96' }}>
             <div className="w-3 h-3 rounded-full border-2 border-t-transparent animate-spin" style={{ borderColor: '#e63329', borderTopColor: 'transparent' }} />
             Synchronisation...
           </div>
@@ -165,14 +165,14 @@ export default function ObjectivesClient({
       <div className="grid grid-cols-4 gap-3">
         {quarters.map(({ q, target, actual, rate }) => (
           <div key={q} className="card p-4 rounded-xl">
-            <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ fontFamily: 'Syne, sans-serif', color: '#5a5a5a' }}>
+            <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ fontFamily: 'Syne, sans-serif', color: '#a09d96' }}>
               Q{q}
             </p>
             <div className="flex items-end justify-between mb-2">
               <span className={cn('text-xl font-bold', getCompletionColor(rate))} style={{ fontFamily: 'Syne, sans-serif' }}>
                 {rate}%
               </span>
-              <span className="text-xs" style={{ color: '#5a5a5a' }}>{actual}/{target}</span>
+              <span className="text-xs" style={{ color: '#a09d96' }}>{actual}/{target}</span>
             </div>
             <div className="progress-bar">
               <div
@@ -186,16 +186,16 @@ export default function ObjectivesClient({
 
       {/* Monthly table */}
       <div className="card rounded-2xl overflow-hidden">
-        <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: '#2a2a2a' }}>
-          <h2 className="font-bold" style={{ fontFamily: 'Syne, sans-serif', color: '#f5f5f5' }}>
+        <div className="px-6 py-4 border-b flex items-center justify-between" style={{ borderColor: '#e0ddd6' }}>
+          <h2 className="font-bold" style={{ fontFamily: 'Syne, sans-serif', color: '#1a1a1a' }}>
             Détail mensuel
           </h2>
-          <p className="text-xs" style={{ color: '#5a5a5a' }}>
+          <p className="text-xs" style={{ color: '#a09d96' }}>
             Clique ✏️ pour mettre à jour ton réel
           </p>
         </div>
 
-        <div className="divide-y" style={{ borderColor: '#1e1e1e' }}>
+        <div className="divide-y" style={{ borderColor: '#edeae3' }}>
           {MONTH_NAMES.map((monthName, idx) => {
             const month = idx + 1
             const obj = objectives.find(o => o.month === month)
@@ -224,7 +224,7 @@ export default function ObjectivesClient({
                     className="font-medium text-sm"
                     style={{
                       fontFamily: 'Syne, sans-serif',
-                      color: isCurrentMonth ? '#f5f5f5' : month > currentMonth ? '#5a5a5a' : '#a0a0a0',
+                      color: isCurrentMonth ? '#1a1a1a' : month > currentMonth ? '#a09d96' : '#6b6860',
                     }}
                   >
                     {monthName}
@@ -233,14 +233,14 @@ export default function ObjectivesClient({
 
                 {/* Working days */}
                 <div className="w-24 text-center">
-                  <span className="text-xs" style={{ color: '#5a5a5a' }}>
+                  <span className="text-xs" style={{ color: '#a09d96' }}>
                     {obj.working_days}j travaillés
                   </span>
                 </div>
 
                 {/* Target */}
                 <div className="w-28 text-center">
-                  <span className="text-sm font-medium" style={{ color: '#a0a0a0' }}>
+                  <span className="text-sm font-medium" style={{ color: '#6b6860' }}>
                     {obj.target_concepts}
                   </span>
                 </div>
@@ -279,7 +279,7 @@ export default function ObjectivesClient({
                       <button
                         onClick={() => startEdit(obj)}
                         className="opacity-0 group-hover:opacity-100 p-0.5 rounded transition-opacity"
-                        style={{ color: '#5a5a5a' }}
+                        style={{ color: '#a09d96' }}
                       >
                         <Edit2 size={10} />
                       </button>
@@ -323,7 +323,7 @@ function StatCard({ icon, label, value, suffix, progressRate }: {
     <div className="stat-card rounded-2xl">
       <div className="flex items-center gap-2">
         {icon}
-        <span className="text-xs uppercase tracking-wider" style={{ fontFamily: 'Syne, sans-serif', color: '#5a5a5a' }}>
+        <span className="text-xs uppercase tracking-wider" style={{ fontFamily: 'Syne, sans-serif', color: '#a09d96' }}>
           {label}
         </span>
       </div>
@@ -331,7 +331,7 @@ function StatCard({ icon, label, value, suffix, progressRate }: {
         <span className="text-3xl font-bold text-white" style={{ fontFamily: 'Syne, sans-serif' }}>
           {value}
         </span>
-        {suffix && <span className="text-xs" style={{ color: '#5a5a5a' }}>{suffix}</span>}
+        {suffix && <span className="text-xs" style={{ color: '#a09d96' }}>{suffix}</span>}
       </div>
       {progressRate !== undefined && (
         <div className="progress-bar mt-1">

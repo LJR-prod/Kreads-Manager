@@ -11,72 +11,54 @@ export default function AuthPage() {
     setLoading(true)
     await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
+      options: { redirectTo: `${window.location.origin}/auth/callback` },
     })
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden" style={{ background: '#080808' }}>
-      {/* Background gradient */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background: 'radial-gradient(ellipse at 20% 50%, rgba(230,51,41,0.08) 0%, transparent 60%), radial-gradient(ellipse at 80% 20%, rgba(230,51,41,0.05) 0%, transparent 50%)',
-        }}
-      />
-      {/* Grid lines */}
-      <div
-        className="absolute inset-0"
-        style={{
-          opacity: 0.03,
-          backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
-        }}
-      />
+    <div className="min-h-screen flex items-center justify-center" style={{ background: '#f5f3ee' }}>
+      {/* Subtle texture */}
+      <div className="absolute inset-0 opacity-[0.015]" style={{
+        backgroundImage: 'radial-gradient(circle, #1a1a1a 1px, transparent 1px)',
+        backgroundSize: '24px 24px',
+      }} />
 
       <div className="relative z-10 w-full max-w-sm mx-4">
         {/* Logo */}
         <div className="text-center mb-10">
-          <div className="inline-flex items-center gap-2 mb-6">
-            <div
-              className="w-8 h-8 rounded-lg flex items-center justify-center"
-              style={{ background: '#e63329' }}
-            >
-              <span className="text-white font-bold text-sm" style={{ fontFamily: 'Syne, sans-serif' }}>K</span>
+          <div className="inline-flex items-center gap-2.5 mb-8">
+            <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: '#e63329' }}>
+              <span className="text-white font-bold" style={{ fontFamily: 'Syne, sans-serif' }}>K</span>
             </div>
-            <span className="text-xl font-bold" style={{ fontFamily: 'Syne, sans-serif', color: '#f5f5f5' }}>
+            <span className="text-xl font-bold" style={{ fontFamily: 'Syne, sans-serif', color: '#1a1a1a' }}>
               Kreads <span style={{ color: '#e63329' }}>Manager</span>
             </span>
           </div>
-          <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Syne, sans-serif', color: '#f5f5f5' }}>
+          <h1 className="text-3xl font-bold mb-2" style={{ fontFamily: 'Syne, sans-serif', color: '#1a1a1a' }}>
             Bienvenue
           </h1>
-          <p className="text-sm" style={{ color: '#a0a0a0' }}>
+          <p className="text-sm" style={{ color: '#6b6860' }}>
             Espace de management de l&apos;équipe montage
           </p>
         </div>
 
         {/* Card */}
-        <div className="rounded-2xl p-8 border" style={{ background: '#161616', borderColor: '#2a2a2a' }}>
+        <div className="rounded-2xl p-8" style={{ background: 'white', border: '1px solid #e0ddd6', boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
           <button
             onClick={handleGoogleLogin}
             disabled={loading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl border font-medium text-sm transition-all duration-200"
+            className="w-full flex items-center justify-center gap-3 px-4 py-3 rounded-xl font-medium text-sm transition-all duration-150"
             style={{
-              background: '#111111',
-              borderColor: '#3a3a3a',
-              color: '#f5f5f5',
+              background: loading ? '#f5f3ee' : 'white',
+              border: '1.5px solid #e0ddd6',
+              color: '#1a1a1a',
               cursor: loading ? 'not-allowed' : 'pointer',
-              opacity: loading ? 0.7 : 1,
             }}
+            onMouseEnter={e => { if (!loading) (e.currentTarget).style.borderColor = '#e63329' }}
+            onMouseLeave={e => { (e.currentTarget).style.borderColor = '#e0ddd6' }}
           >
             {loading ? (
-              <div
-                className="w-4 h-4 rounded-full border-2 animate-spin"
-                style={{ borderColor: '#e63329', borderTopColor: 'transparent' }}
-              />
+              <div className="w-4 h-4 rounded-full border-2 animate-spin" style={{ borderColor: '#e63329', borderTopColor: 'transparent' }} />
             ) : (
               <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
                 <path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18z"/>
@@ -87,15 +69,10 @@ export default function AuthPage() {
             )}
             {loading ? 'Connexion...' : 'Continuer avec Google'}
           </button>
-
-          <p className="text-center text-xs mt-6" style={{ color: '#5a5a5a' }}>
-            Accès réservé à l&apos;équipe Kreads
-          </p>
+          <p className="text-center text-xs mt-5" style={{ color: '#a09d96' }}>Accès réservé à l&apos;équipe Kreads</p>
         </div>
 
-        <p className="text-center text-xs mt-6" style={{ color: '#3a3a3a' }}>
-          © {new Date().getFullYear()} Kreads — Tous droits réservés
-        </p>
+        <p className="text-center text-xs mt-6" style={{ color: '#ccc9c0' }}>© {new Date().getFullYear()} Kreads</p>
       </div>
     </div>
   )

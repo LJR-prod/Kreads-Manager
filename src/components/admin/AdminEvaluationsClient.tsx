@@ -26,14 +26,14 @@ function ScoreBar({ score, label }: { score: number; label: string }) {
   return (
     <div className="space-y-1">
       <div className="flex justify-between items-center">
-        <span className="text-xs" style={{ color: '#a0a0a0' }}>{label}</span>
+        <span className="text-xs" style={{ color: '#6b6860' }}>{label}</span>
         <div className="flex items-center gap-1">
           {[1, 2, 3, 4, 5].map(s => (
             <Star
               key={s}
               size={11}
               fill={s <= score ? color : 'none'}
-              stroke={s <= score ? color : '#3a3a3a'}
+              stroke={s <= score ? color : '#ccc9c0'}
             />
           ))}
           <span className="text-xs ml-1 font-bold" style={{ color, fontFamily: 'Syne, sans-serif' }}>
@@ -78,11 +78,11 @@ export default function AdminEvaluationsClient({
           <h1 className="text-2xl font-bold text-white" style={{ fontFamily: 'Syne, sans-serif' }}>
             Évaluations Creative Strategists
           </h1>
-          <p className="text-sm mt-1" style={{ color: '#a0a0a0' }}>
+          <p className="text-sm mt-1" style={{ color: '#6b6860' }}>
             Notes par quarter · {quarterEvals.length} évaluation{quarterEvals.length > 1 ? 's' : ''} reçue{quarterEvals.length > 1 ? 's' : ''}
           </p>
         </div>
-        <div className="flex gap-1 p-1 rounded-xl" style={{ background: '#161616', border: '1px solid #2a2a2a' }}>
+        <div className="flex gap-1 p-1 rounded-xl" style={{ background: '#ffffff', border: '1px solid #2a2a2a' }}>
           {[1, 2, 3, 4].map(q => (
             <button
               key={q}
@@ -91,7 +91,7 @@ export default function AdminEvaluationsClient({
               style={{
                 fontFamily: 'Syne, sans-serif',
                 background: selectedQuarter === q ? '#e63329' : 'transparent',
-                color: selectedQuarter === q ? 'white' : '#5a5a5a',
+                color: selectedQuarter === q ? 'white' : '#a09d96',
               }}
             >
               Q{q}
@@ -107,7 +107,7 @@ export default function AdminEvaluationsClient({
           const avg = globalAvg(evals)
           const avgNum = avg ? parseFloat(avg) : 0
           const isExpanded = expandedEditor === editor.id
-          const avgColor = avgNum >= 4 ? '#10b981' : avgNum >= 3 ? '#f59e0b' : avgNum > 0 ? '#ef4444' : '#5a5a5a'
+          const avgColor = avgNum >= 4 ? '#10b981' : avgNum >= 3 ? '#f59e0b' : avgNum > 0 ? '#ef4444' : '#a09d96'
 
           return (
             <div key={editor.id} className="card rounded-2xl overflow-hidden">
@@ -124,10 +124,10 @@ export default function AdminEvaluationsClient({
                 </div>
 
                 <div className="flex-1">
-                  <p className="font-bold text-sm" style={{ fontFamily: 'Syne, sans-serif', color: '#f5f5f5' }}>
+                  <p className="font-bold text-sm" style={{ fontFamily: 'Syne, sans-serif', color: '#1a1a1a' }}>
                     {editor.name.split(' ')[0]}
                   </p>
-                  <p className="text-xs" style={{ color: '#5a5a5a' }}>
+                  <p className="text-xs" style={{ color: '#a09d96' }}>
                     {evals.length} évaluation{evals.length > 1 ? 's' : ''} ce quarter
                   </p>
                 </div>
@@ -143,41 +143,41 @@ export default function AdminEvaluationsClient({
                           <p className="text-xs font-bold" style={{ fontFamily: 'Syne, sans-serif', color: c }}>
                             {getAvgScore(evals, key) ?? '—'}
                           </p>
-                          <p className="text-xs" style={{ color: '#3a3a3a', fontSize: '0.6rem' }}>
+                          <p className="text-xs" style={{ color: '#ccc9c0', fontSize: '0.6rem' }}>
                             {key === 'quality_score' ? 'Qualité' : key === 'avoidable_returns_score' ? 'Retours' : key === 'communication_score' ? 'Commu.' : 'Deadlines'}
                           </p>
                         </div>
                       )
                     })}
-                    <div className="text-center border-l pl-4" style={{ borderColor: '#2a2a2a' }}>
+                    <div className="text-center border-l pl-4" style={{ borderColor: '#e0ddd6' }}>
                       <p className="text-sm font-bold" style={{ fontFamily: 'Syne, sans-serif', color: avgColor }}>
                         {avg ?? '—'}
                       </p>
-                      <p className="text-xs" style={{ color: '#3a3a3a', fontSize: '0.6rem' }}>Moy.</p>
+                      <p className="text-xs" style={{ color: '#ccc9c0', fontSize: '0.6rem' }}>Moy.</p>
                     </div>
                   </div>
                 )}
 
                 {evals.length === 0 && (
-                  <span className="text-xs" style={{ color: '#3a3a3a' }}>Aucune évaluation</span>
+                  <span className="text-xs" style={{ color: '#ccc9c0' }}>Aucune évaluation</span>
                 )}
 
-                <div style={{ color: '#5a5a5a' }}>
+                <div style={{ color: '#a09d96' }}>
                   {isExpanded ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
                 </div>
               </div>
 
               {/* Expanded evaluations */}
               {isExpanded && evals.length > 0 && (
-                <div className="border-t divide-y" style={{ borderColor: '#1e1e1e' }}>
+                <div className="border-t divide-y" style={{ borderColor: '#edeae3' }}>
                   {evals.map(ev => (
                     <div key={ev.id} className="px-5 py-4 space-y-3">
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="text-sm font-medium" style={{ color: '#f5f5f5' }}>
+                          <p className="text-sm font-medium" style={{ color: '#1a1a1a' }}>
                             {ev.cs_name}
                           </p>
-                          <p className="text-xs" style={{ color: '#5a5a5a' }}>
+                          <p className="text-xs" style={{ color: '#a09d96' }}>
                             {format(new Date(ev.submitted_at), 'd MMMM yyyy à HH:mm', { locale: fr })}
                           </p>
                         </div>
@@ -190,14 +190,14 @@ export default function AdminEvaluationsClient({
                       </div>
 
                       {ev.comment && (
-                        <div className="p-3 rounded-xl" style={{ background: '#111111', border: '1px solid #1e1e1e' }}>
+                        <div className="p-3 rounded-xl" style={{ background: '#f9f8f5', border: '1px solid #1e1e1e' }}>
                           <div className="flex items-center gap-1.5 mb-1.5">
-                            <MessageSquare size={11} style={{ color: '#5a5a5a' }} />
-                            <span className="text-xs uppercase tracking-wider" style={{ color: '#5a5a5a', fontFamily: 'Syne, sans-serif' }}>
+                            <MessageSquare size={11} style={{ color: '#a09d96' }} />
+                            <span className="text-xs uppercase tracking-wider" style={{ color: '#a09d96', fontFamily: 'Syne, sans-serif' }}>
                               Commentaire
                             </span>
                           </div>
-                          <p className="text-sm" style={{ color: '#a0a0a0', lineHeight: 1.6 }}>
+                          <p className="text-sm" style={{ color: '#6b6860', lineHeight: 1.6 }}>
                             {ev.comment}
                           </p>
                         </div>
