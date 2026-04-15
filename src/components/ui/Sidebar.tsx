@@ -34,7 +34,6 @@ export default function Sidebar({ profile }: SidebarProps) {
 
   return (
     <aside className="w-60 flex-shrink-0 flex flex-col border-r h-full" style={{ background: '#ffffff', borderColor: '#e0ddd6' }}>
-      {/* Logo */}
       <div className="px-5 py-5 border-b" style={{ borderColor: '#e0ddd6' }}>
         <div className="flex items-center gap-2.5">
           <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: '#e63329' }}>
@@ -47,7 +46,6 @@ export default function Sidebar({ profile }: SidebarProps) {
         </div>
       </div>
 
-      {/* Nav */}
       <nav className="flex-1 px-3 py-4 space-y-0.5">
         {isAdmin && (
           <>
@@ -60,7 +58,6 @@ export default function Sidebar({ profile }: SidebarProps) {
         {editorNav.map(item => <NavLink key={item.href} item={item} pathname={pathname} />)}
       </nav>
 
-      {/* User */}
       <div className="px-3 py-4 border-t" style={{ borderColor: '#e0ddd6' }}>
         <div className="flex items-center gap-3 px-2 py-2 rounded-lg mb-1" style={{ background: '#f5f3ee' }}>
           <div className="w-7 h-7 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold" style={{ background: '#e63329', color: 'white', fontFamily: 'Syne, sans-serif' }}>
