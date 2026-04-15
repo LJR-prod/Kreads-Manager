@@ -1,8 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { format, getDaysInMonth, getDay } from 'date-fns'
-import { Target, TrendingUp, CheckCircle, Edit2, Check, X } from 'lucide-react'
+import { Target, TrendingUp, CheckCircle, Edit2, Check, X, RefreshCw } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import { MonthlyObjective, Availability, FrenchHoliday, Profile, MONTH_NAMES } from '@/types'
 import { getMonthWorkingDays, calculateMonthlyTarget, getCompletionColor, getCompletionBg, cn } from '@/lib/utils'
@@ -16,8 +15,9 @@ interface ObjectivesClientProps {
   isAdmin: boolean
 }
 
-export default function ObjectivesClient({ profile, initialObjectives, availabilities, holidays, year, isAdmin }: ObjectivesClientProps) {
+export default function ObjectivesClient({ profile, initialObjectives, availabilities: initialAvailabilities, holidays, year, isAdmin }: ObjectivesClientProps) {
   const [objectives, setObjectives] = useState<MonthlyObjective[]>(initialObjectives)
+  const [availabilities, setAvailabilities] = useState<Availability[]>(initialAvailabilities)
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editValue, setEditValue] = useState('')
   const [syncing, setSyncing] = useState(false)
@@ -26,27 +26,65 @@ export default function ObjectivesClient({ profile, initialObjectives, availabil
   const holidayDates = holidays.map(h => h.date)
   const currentMonth = new Date().getMonth() + 1
 
-  useEffect(() => { syncAllMonthObjectives() }, [availabilities, holidays])
+  // Recharge les dispos depuis Supabase à chaque fois qu'on arrive sur la page
+  useEffect(() => {
+    const loadAndSync = async () => {
+      const { data } = await supabase
+        .from('availabilities')
+        .select('*')
+        .eq('editor_id', profile.id)
+      if (data) {
+        setAvailabilities(data)
+      }
+    }
+    loadAndSync()
+  }, [])
+
+  // Recalcule les objectifs dès que les dispos changent
+  useEffect(() => {
+    if (availabilities.length >= 0) {
+      syncAllMonthObjectives()
+    }
+  }, [availabilities])
 
   const syncAllMonthObjectives = async () => {
     setSyncing(true)
+    const updatedObjectives = [...objectives]
+
     for (let month = 1; month <= 12; month++) {
       const courseDays = availabilities
         .filter(a => a.type === 'cours' && a.date.startsWith(`${year}-${String(month).padStart(2, '0')}`))
         .map(a => a.date)
       const workingDays = getMonthWorkingDays(year, month, holidayDates, courseDays)
       const target = calculateMonthlyTarget(workingDays)
-      const existing = objectives.find(o => o.month === month)
+      const existing = updatedObjectives.find(o => o.month === month)
 
       if (!existing) {
-        const { data } = await supabase.from('monthly_objectives').upsert({ editor_id: profile.id, year, month, target_concepts: target, working_days: workingDays, actual_concepts: 0 }, { onConflict: 'editor_id,year,month' }).select().single()
-        if (data) setObjectives(prev => { const exists = prev.find(o => o.month === month); if (exists) return prev.map(o => o.month === month ? data : o); return [...prev, data] })
+        const { data } = await supabase
+          .from('monthly_objectives')
+          .upsert({ editor_id: profile.id, year, month, target_concepts: target, working_days: workingDays, actual_concepts: 0 }, { onConflict: 'editor_id,year,month' })
+          .select().single()
+        if (data) updatedObjectives.push(data)
       } else if (existing.target_concepts !== target || existing.working_days !== workingDays) {
-        const { data } = await supabase.from('monthly_objectives').update({ target_concepts: target, working_days: workingDays }).eq('id', existing.id).select().single()
-        if (data) setObjectives(prev => prev.map(o => o.id === existing.id ? data : o))
+        const { data } = await supabase
+          .from('monthly_objectives')
+          .update({ target_concepts: target, working_days: workingDays })
+          .eq('id', existing.id)
+          .select().single()
+        if (data) {
+          const idx = updatedObjectives.findIndex(o => o.id === existing.id)
+          if (idx !== -1) updatedObjectives[idx] = data
+        }
       }
     }
+
+    setObjectives([...updatedObjectives])
     setSyncing(false)
+  }
+
+  const handleRefresh = async () => {
+    const { data } = await supabase.from('availabilities').select('*').eq('editor_id', profile.id)
+    if (data) setAvailabilities(data)
   }
 
   const startEdit = (obj: MonthlyObjective) => { setEditingId(obj.id); setEditValue(String(obj.actual_concepts)) }
@@ -79,12 +117,25 @@ export default function ObjectivesClient({ profile, initialObjectives, availabil
           <h1 className="text-2xl font-bold" style={{ fontFamily: 'Syne, sans-serif', color: '#1a1a1a' }}>Objectifs {year}</h1>
           <p className="text-sm mt-1" style={{ color: '#6b6860' }}>5 concepts par jour travaillé · hors WE, fériés et cours</p>
         </div>
-        {syncing && (
-          <div className="flex items-center gap-2 text-xs" style={{ color: '#a09d96' }}>
-            <div className="w-3 h-3 rounded-full border-2 animate-spin" style={{ borderColor: '#e63329', borderTopColor: 'transparent' }} />
-            Synchronisation...
-          </div>
-        )}
+        <div className="flex items-center gap-3">
+          {syncing && (
+            <div className="flex items-center gap-2 text-xs" style={{ color: '#a09d96' }}>
+              <div className="w-3 h-3 rounded-full border-2 animate-spin" style={{ borderColor: '#e63329', borderTopColor: 'transparent' }} />
+              Synchronisation...
+            </div>
+          )}
+          <button
+            onClick={handleRefresh}
+            disabled={syncing}
+            className="flex items-center gap-2 text-xs px-3 py-2 rounded-lg border transition-all duration-200"
+            style={{ color: '#6b6860', borderColor: '#e0ddd6', background: 'white' }}
+            onMouseEnter={e => { (e.currentTarget).style.borderColor = '#e63329'; (e.currentTarget).style.color = '#e63329' }}
+            onMouseLeave={e => { (e.currentTarget).style.borderColor = '#e0ddd6'; (e.currentTarget).style.color = '#6b6860' }}
+          >
+            <RefreshCw size={12} />
+            Recalculer
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-3 gap-4">
