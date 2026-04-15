@@ -17,14 +17,12 @@ export default function AuthPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center" style={{ background: '#f5f3ee' }}>
-      {/* Subtle texture */}
       <div className="absolute inset-0 opacity-[0.015]" style={{
         backgroundImage: 'radial-gradient(circle, #1a1a1a 1px, transparent 1px)',
         backgroundSize: '24px 24px',
       }} />
 
       <div className="relative z-10 w-full max-w-sm mx-4">
-        {/* Logo */}
         <div className="text-center mb-10">
           <div className="inline-flex items-center gap-2.5 mb-8">
             <div className="w-9 h-9 rounded-xl flex items-center justify-center" style={{ background: '#e63329' }}>
@@ -42,7 +40,6 @@ export default function AuthPage() {
           </p>
         </div>
 
-        {/* Card */}
         <div className="rounded-2xl p-8" style={{ background: 'white', border: '1px solid #e0ddd6', boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
           <button
             onClick={handleGoogleLogin}
