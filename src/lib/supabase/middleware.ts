@@ -39,18 +39,7 @@ export async function updateSession(request: NextRequest) {
   }
 
   if (request.nextUrl.pathname.startsWith('/admin') && user) {
-    const supabaseAdmin = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://placeholder.supabase.co',
-      process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? 'placeholder',
-      {
-        cookies: {
-          getAll() { return request.cookies.getAll() },
-          setAll() {},
-        },
-      }
-    )
-
-    const { data: profile } = await supabaseAdmin
+    const { data: profile } = await supabase
       .from('profiles')
       .select('role')
       .eq('id', user.id)
