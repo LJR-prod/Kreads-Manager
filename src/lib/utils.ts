@@ -61,10 +61,10 @@ export function formatCurrency(amount: number): string {
 }
 
 export function getCompletionColor(rate: number): string {
-  if (rate >= 100) return 'text-emerald-400'
-  if (rate >= 75) return 'text-yellow-400'
-  if (rate >= 50) return 'text-orange-400'
-  return 'text-red-400'
+  if (rate >= 100) return 'text-emerald-600'
+  if (rate >= 75) return 'text-yellow-600'
+  if (rate >= 50) return 'text-orange-500'
+  return 'text-red-500'
 }
 
 export function getCompletionBg(rate: number): string {
