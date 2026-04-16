@@ -28,7 +28,6 @@ export default function ObjectivesClient({ profile, initialObjectives, holidays,
   const recalculate = useCallback(async () => {
     setSyncing(true)
     try {
-      // 1. Recharge les dispos fraîches depuis Supabase
       const { data: freshAvailabilities } = await supabase
         .from('availabilities')
         .select('*')
@@ -36,7 +35,6 @@ export default function ObjectivesClient({ profile, initialObjectives, holidays,
 
       const avails = freshAvailabilities || []
 
-      // 2. Recharge les objectifs existants
       const { data: existingObjs } = await supabase
         .from('monthly_objectives')
         .select('*')
@@ -44,14 +42,15 @@ export default function ObjectivesClient({ profile, initialObjectives, holidays,
         .eq('year', year)
 
       const existing = existingObjs || []
-
-      // 3. Recalcule et upsert chaque mois
       const results: MonthlyObjective[] = []
+
       for (let month = 1; month <= 12; month++) {
-        const courseDays = avails
-          .filter(a => a.type === 'cours' && a.date.startsWith(`${year}-${String(month).padStart(2, '0')}`))
+        // Exclut cours + tournage + congé du calcul
+        const unavailableDays = avails
+          .filter(a => a.date.startsWith(`${year}-${String(month).padStart(2, '0')}`))
           .map(a => a.date)
-        const workingDays = getMonthWorkingDays(year, month, holidayDates, courseDays)
+
+        const workingDays = getMonthWorkingDays(year, month, holidayDates, unavailableDays)
         const target = calculateMonthlyTarget(workingDays)
         const existingMonth = existing.find(o => o.month === month)
         const actualConcepts = existingMonth?.actual_concepts ?? 0
@@ -76,17 +75,24 @@ export default function ObjectivesClient({ profile, initialObjectives, holidays,
     } finally {
       setSyncing(false)
     }
-  }, [profile.id, year, holidayDates])
+  }, [profile.id, year])
 
-  // Recalcule au chargement de la page
   useEffect(() => { recalculate() }, [])
 
-  const startEdit = (obj: MonthlyObjective) => { setEditingId(obj.id); setEditValue(String(obj.actual_concepts)) }
+  const startEdit = (obj: MonthlyObjective) => {
+    setEditingId(obj.id)
+    setEditValue(String(obj.actual_concepts))
+  }
 
   const saveEdit = async (obj: MonthlyObjective) => {
     const val = parseInt(editValue)
     if (isNaN(val) || val < 0) return
-    const { data } = await supabase.from('monthly_objectives').update({ actual_concepts: val }).eq('id', obj.id).select().single()
+    const { data } = await supabase
+      .from('monthly_objectives')
+      .update({ actual_concepts: val })
+      .eq('id', obj.id)
+      .select()
+      .single()
     if (data) setObjectives(prev => prev.map(o => o.id === obj.id ? data : o))
     setEditingId(null)
   }
@@ -108,8 +114,12 @@ export default function ObjectivesClient({ profile, initialObjectives, holidays,
     <div className="max-w-5xl mx-auto space-y-8">
       <div className="flex items-start justify-between">
         <div>
-          <h1 className="text-2xl font-bold" style={{ fontFamily: 'Syne, sans-serif', color: '#1a1a1a' }}>Objectifs {year}</h1>
-          <p className="text-sm mt-1" style={{ color: '#6b6860' }}>5 concepts par jour travaillé · hors WE, fériés et cours</p>
+          <h1 className="text-2xl font-bold" style={{ fontFamily: 'Syne, sans-serif', color: '#1a1a1a' }}>
+            Objectifs {year}
+          </h1>
+          <p className="text-sm mt-1" style={{ color: '#6b6860' }}>
+            5 concepts par jour travaillé · hors WE, fériés, cours, tournages et congés
+          </p>
         </div>
         <button
           onClick={recalculate}
@@ -133,10 +143,14 @@ export default function ObjectivesClient({ profile, initialObjectives, holidays,
           <div key={i} className="stat-card rounded-2xl">
             <div className="flex items-center gap-2">
               {stat.icon}
-              <span className="text-xs uppercase tracking-wider" style={{ fontFamily: 'Syne, sans-serif', color: '#a09d96' }}>{stat.label}</span>
+              <span className="text-xs uppercase tracking-wider" style={{ fontFamily: 'Syne, sans-serif', color: '#a09d96' }}>
+                {stat.label}
+              </span>
             </div>
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold" style={{ fontFamily: 'Syne, sans-serif', color: '#1a1a1a' }}>{stat.value}</span>
+              <span className="text-3xl font-bold" style={{ fontFamily: 'Syne, sans-serif', color: '#1a1a1a' }}>
+                {stat.value}
+              </span>
               {stat.suffix && <span className="text-xs" style={{ color: '#a09d96' }}>{stat.suffix}</span>}
             </div>
             {stat.progressRate !== undefined && (
@@ -151,9 +165,13 @@ export default function ObjectivesClient({ profile, initialObjectives, holidays,
       <div className="grid grid-cols-4 gap-3">
         {quarters.map(({ q, target, actual, rate }) => (
           <div key={q} className="card p-4 rounded-xl">
-            <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ fontFamily: 'Syne, sans-serif', color: '#a09d96' }}>Q{q}</p>
+            <p className="text-xs font-bold uppercase tracking-wider mb-3" style={{ fontFamily: 'Syne, sans-serif', color: '#a09d96' }}>
+              Q{q}
+            </p>
             <div className="flex items-end justify-between mb-2">
-              <span className={cn('text-xl font-bold', getCompletionColor(rate))} style={{ fontFamily: 'Syne, sans-serif' }}>{rate}%</span>
+              <span className={cn('text-xl font-bold', getCompletionColor(rate))} style={{ fontFamily: 'Syne, sans-serif' }}>
+                {rate}%
+              </span>
               <span className="text-xs" style={{ color: '#a09d96' }}>{actual}/{target}</span>
             </div>
             <div className="progress-bar">
@@ -177,41 +195,77 @@ export default function ObjectivesClient({ profile, initialObjectives, holidays,
             const isCurrentMonth = month === currentMonth
 
             return (
-              <div key={month} className="flex items-center px-6 py-4 transition-all duration-150" style={{ background: isCurrentMonth ? '#faf9f7' : undefined }}>
+              <div
+                key={month}
+                className="flex items-center px-6 py-4 transition-all duration-150"
+                style={{ background: isCurrentMonth ? '#faf9f7' : undefined }}
+              >
                 <div className="w-32 flex items-center gap-2">
                   {isCurrentMonth && <div className="w-1.5 h-1.5 rounded-full" style={{ background: '#e63329' }} />}
-                  <span className="font-medium text-sm" style={{ fontFamily: 'Syne, sans-serif', color: isCurrentMonth ? '#1a1a1a' : month > currentMonth ? '#ccc9c0' : '#6b6860' }}>
+                  <span className="font-medium text-sm" style={{
+                    fontFamily: 'Syne, sans-serif',
+                    color: isCurrentMonth ? '#1a1a1a' : month > currentMonth ? '#ccc9c0' : '#6b6860'
+                  }}>
                     {monthName}
                   </span>
                 </div>
+
                 <div className="w-24 text-center">
                   <span className="text-xs" style={{ color: '#a09d96' }}>{obj.working_days}j travaillés</span>
                 </div>
+
                 <div className="w-28 text-center">
                   <span className="text-sm font-medium" style={{ color: '#6b6860' }}>{obj.target_concepts}</span>
                 </div>
+
                 <div className="w-28 text-center">
                   {editingId === obj.id ? (
                     <div className="flex items-center gap-1 justify-center">
-                      <input type="number" value={editValue} onChange={e => setEditValue(e.target.value)} className="input w-16 text-center text-sm py-1 px-2" min={0} autoFocus
-                        onKeyDown={e => { if (e.key === 'Enter') saveEdit(obj); if (e.key === 'Escape') setEditingId(null) }} />
-                      <button onClick={() => saveEdit(obj)} className="p-1 rounded" style={{ color: '#10b981' }}><Check size={12} /></button>
-                      <button onClick={() => setEditingId(null)} className="p-1 rounded" style={{ color: '#ef4444' }}><X size={12} /></button>
+                      <input
+                        type="number"
+                        value={editValue}
+                        onChange={e => setEditValue(e.target.value)}
+                        className="input w-16 text-center text-sm py-1 px-2"
+                        min={0}
+                        autoFocus
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') saveEdit(obj)
+                          if (e.key === 'Escape') setEditingId(null)
+                        }}
+                      />
+                      <button onClick={() => saveEdit(obj)} className="p-1 rounded" style={{ color: '#10b981' }}>
+                        <Check size={12} />
+                      </button>
+                      <button onClick={() => setEditingId(null)} className="p-1 rounded" style={{ color: '#ef4444' }}>
+                        <X size={12} />
+                      </button>
                     </div>
                   ) : (
                     <div className="flex items-center gap-1 justify-center group">
-                      <span className={cn('text-sm font-bold', getCompletionColor(rate))} style={{ fontFamily: 'Syne, sans-serif' }}>{obj.actual_concepts}</span>
-                      <button onClick={() => startEdit(obj)} className="opacity-0 group-hover:opacity-100 p-0.5 rounded transition-opacity" style={{ color: '#a09d96' }}><Edit2 size={10} /></button>
+                      <span className={cn('text-sm font-bold', getCompletionColor(rate))} style={{ fontFamily: 'Syne, sans-serif' }}>
+                        {obj.actual_concepts}
+                      </span>
+                      <button
+                        onClick={() => startEdit(obj)}
+                        className="opacity-0 group-hover:opacity-100 p-0.5 rounded transition-opacity"
+                        style={{ color: '#a09d96' }}
+                      >
+                        <Edit2 size={10} />
+                      </button>
                     </div>
                   )}
                 </div>
+
                 <div className="flex-1 mx-4">
                   <div className="progress-bar">
                     <div className={cn('progress-fill', getCompletionBg(rate))} style={{ width: `${Math.min(rate, 100)}%` }} />
                   </div>
                 </div>
+
                 <div className="w-14 text-right">
-                  <span className={cn('text-sm font-bold', getCompletionColor(rate))} style={{ fontFamily: 'Syne, sans-serif' }}>{rate}%</span>
+                  <span className={cn('text-sm font-bold', getCompletionColor(rate))} style={{ fontFamily: 'Syne, sans-serif' }}>
+                    {rate}%
+                  </span>
                 </div>
               </div>
             )
