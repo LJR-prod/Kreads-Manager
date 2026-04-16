@@ -8,7 +8,7 @@ export function getMonthWorkingDays(
   year: number,
   month: number,
   holidays: string[],
-  courseDays: string[]
+  unavailableDays: string[]
 ): number {
   const daysInMonth = getDaysInMonth(new Date(year, month - 1))
   let workingDays = 0
@@ -20,9 +20,9 @@ export function getMonthWorkingDays(
 
     const isWeekend = dayOfWeek === 0 || dayOfWeek === 6
     const isHoliday = holidays.includes(dateStr)
-    const isCours = courseDays.includes(dateStr)
+    const isUnavailable = unavailableDays.includes(dateStr)
 
-    if (!isWeekend && !isHoliday && !isCours) {
+    if (!isWeekend && !isHoliday && !isUnavailable) {
       workingDays++
     }
   }
