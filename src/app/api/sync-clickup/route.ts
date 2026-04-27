@@ -45,7 +45,6 @@ async function getAllTasks(month: number, year: number): Promise<any[]> {
   return allTasks
 }
 
-// Récupère le nom du monteur depuis le champ custom dropdown "Monteur"
 function getMonteurFromTask(task: any): string | null {
   const customFields = task.custom_fields || []
   const monteurField = customFields.find((f: any) =>
@@ -59,10 +58,6 @@ function getMonteurFromTask(task: any): string | null {
   return selected?.name || null
 }
 
-  return null
-}
-
-// Vérifie si une tâche a atteint REVIEW CS au moins une fois
 async function taskReachedReviewCS(taskId: string): Promise<boolean> {
   try {
     const data = await clickupFetch(
@@ -98,26 +93,21 @@ export async function POST(request: NextRequest) {
 
     if (!editors) return NextResponse.json({ error: 'No editors found' }, { status: 404 })
 
-    // Récupère toutes les tâches du mois
     const allTasks = await getAllTasks(month, year)
 
-    // Initialise le compteur pour chaque monteur
     const countByEditor: Record<string, number> = {}
     for (const editor of editors) {
       countByEditor[editor.id] = 0
     }
 
-    // Déduplique les tâches par ID
     const uniqueTasks = Array.from(
       new Map(allTasks.map((t: any) => [t.id, t])).values()
     )
 
-    // Pour chaque tâche unique, vérifie si elle a atteint REVIEW CS
     for (const task of uniqueTasks) {
       const monteurName = getMonteurFromTask(task)
       if (!monteurName) continue
 
-      // Trouve l'éditeur correspondant (comparaison insensible à la casse)
       const editor = editors.find(e =>
         e.name.toLowerCase().trim() === monteurName.toLowerCase().trim()
       )
@@ -129,7 +119,6 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Met à jour actual_concepts dans Supabase pour chaque monteur
     const results: Record<string, number> = {}
     for (const editor of editors) {
       const count = countByEditor[editor.id] || 0
