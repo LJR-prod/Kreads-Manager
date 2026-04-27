@@ -49,16 +49,14 @@ async function getAllTasks(month: number, year: number): Promise<any[]> {
 function getMonteurFromTask(task: any): string | null {
   const customFields = task.custom_fields || []
   const monteurField = customFields.find((f: any) =>
-    f.name?.toLowerCase() === 'monteur'
+    f.name?.toLowerCase().includes('monteur')
   )
-  if (!monteurField) return null
+  if (!monteurField || monteurField.value === null || monteurField.value === undefined) return null
 
-  // Dropdown — la valeur est dans type_config.options
-  if (monteurField.type === 'drop_down' && monteurField.value !== undefined && monteurField.value !== null) {
-    const options = monteurField.type_config?.options || []
-    const selected = options.find((o: any) => o.orderindex === monteurField.value || o.id === monteurField.value)
-    return selected?.name || null
-  }
+  const options = monteurField.type_config?.options || []
+  const selected = options.find((o: any) => o.orderindex === monteurField.value)
+  return selected?.name || null
+}
 
   return null
 }
