@@ -51,8 +51,9 @@ function getMonteurFromTask(task: any): string | null {
   const monteurField = customFields.find((f: any) =>
     f.name?.toLowerCase().includes('monteur')
   )
-  if (!monteurField || monteurField.value === null || monteurField.value === undefined) return null
-
+  if (!monteurField || monteurField.value === null || monteurField.value === undefined) {
+    return null
+  }
   const options = monteurField.type_config?.options || []
   const selected = options.find((o: any) => o.orderindex === monteurField.value)
   return selected?.name || null
