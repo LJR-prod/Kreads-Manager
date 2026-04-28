@@ -16,10 +16,7 @@ async function clickupFetch(url: string) {
   return res.json()
 }
 
-async function getAllTasks(month: number, year: number): Promise<any[]> {
-  const startOfMonth = new Date(year, month - 1, 1).getTime()
-  const endOfMonth = new Date(year, month, 0, 23, 59, 59).getTime()
-
+async function getAllTasks(): Promise<any[]> {
   let allTasks: any[] = []
   let page = 0
   let hasMore = true
@@ -29,8 +26,6 @@ async function getAllTasks(month: number, year: number): Promise<any[]> {
       page: String(page),
       include_closed: 'true',
       subtasks: 'true',
-      date_updated_gt: String(startOfMonth),
-      date_updated_lt: String(endOfMonth),
     })
 
     const data = await clickupFetch(
@@ -40,6 +35,7 @@ async function getAllTasks(month: number, year: number): Promise<any[]> {
     allTasks = [...allTasks, ...tasks]
     hasMore = tasks.length >= 100
     page++
+    if (page >= 20) break
   }
 
   return allTasks
@@ -58,16 +54,20 @@ function getMonteurFromTask(task: any): string | null {
   return selected?.name || null
 }
 
-async function taskReachedReviewCS(taskId: string): Promise<boolean> {
+async function taskReachedReviewCS(taskId: string, month: number, year: number): Promise<boolean> {
   try {
+    const startOfMonth = new Date(year, month - 1, 1).getTime()
+    const endOfMonth = new Date(year, month, 0, 23, 59, 59, 999).getTime()
     const data = await clickupFetch(
       `https://api.clickup.com/api/v2/task/${taskId}/activity`
     )
     const history = data.history || []
-    return history.some((entry: any) =>
-      entry.field === 'status' &&
-      entry.after?.status?.toLowerCase() === TARGET_STATUS
-    )
+    return history.some((entry: any) => {
+      if (entry.field !== 'status') return false
+      if (entry.after?.status?.toLowerCase() !== TARGET_STATUS) return false
+      const entryDate = parseInt(entry.date)
+      return entryDate >= startOfMonth && entryDate <= endOfMonth
+    })
   } catch {
     return false
   }
@@ -93,7 +93,7 @@ export async function POST(request: NextRequest) {
 
     if (!editors) return NextResponse.json({ error: 'No editors found' }, { status: 404 })
 
-    const allTasks = await getAllTasks(month, year)
+    const allTasks = await getAllTasks()
 
     const countByEditor: Record<string, number> = {}
     for (const editor of editors) {
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
       )
       if (!editor) continue
 
-      const reached = await taskReachedReviewCS(task.id)
+      const reached = await taskReachedReviewCS(task.id, month, year)
       if (reached) {
         countByEditor[editor.id] = (countByEditor[editor.id] || 0) + 1
       }
@@ -134,7 +134,7 @@ export async function POST(request: NextRequest) {
         }, { onConflict: 'editor_id,year,month', ignoreDuplicates: false })
     }
 
-    return NextResponse.json({ success: true, results, month, year })
+    return NextResponse.json({ success: true, results, month, year, tasksScanned: uniqueTasks.length })
   } catch (error: any) {
     console.error('ClickUp sync error:', error)
     return NextResponse.json({ error: error.message }, { status: 500 })
