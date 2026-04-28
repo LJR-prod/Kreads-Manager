@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const CLICKUP_TOKEN = process.env.CLICKUP_API_TOKEN
 const TEAM_ID = process.env.CLICKUP_TEAM_ID
-const TARGET_STATUS = 'review cs'
 
 async function clickupFetch(url: string) {
   const res = await fetch(url, {
@@ -12,30 +11,22 @@ async function clickupFetch(url: string) {
       'Content-Type': 'application/json',
     },
   })
-  if (!res.ok) throw new Error(`ClickUp API error: ${res.status} ${url}`)
+  if (!res.ok) throw new Error(`ClickUp API error: ${res.status}`)
   return res.json()
 }
 
 async function getAllTasks(): Promise<any[]> {
   let allTasks: any[] = []
   let page = 0
-  let hasMore = true
 
-  while (hasMore) {
-    const params = new URLSearchParams({
-      page: String(page),
-      include_closed: 'true',
-      subtasks: 'true',
-    })
-
+  while (page < 20) {
     const data = await clickupFetch(
-      `https://api.clickup.com/api/v2/team/${TEAM_ID}/task?${params}`
+      `https://api.clickup.com/api/v2/team/${TEAM_ID}/task?include_closed=true&subtasks=true&page=${page}`
     )
     const tasks = data.tasks || []
     allTasks = [...allTasks, ...tasks]
-    hasMore = tasks.length >= 100
+    if (tasks.length < 100) break
     page++
-    if (page >= 20) break
   }
 
   return allTasks
@@ -54,23 +45,9 @@ function getMonteurFromTask(task: any): string | null {
   return selected?.name || null
 }
 
-async function taskReachedReviewCS(taskId: string, month: number, year: number): Promise<boolean> {
-  try {
-    const startOfMonth = new Date(year, month - 1, 1).getTime()
-    const endOfMonth = new Date(year, month, 0, 23, 59, 59, 999).getTime()
-    const data = await clickupFetch(
-      `https://api.clickup.com/api/v2/task/${taskId}/activity`
-    )
-    const history = data.history || []
-    return history.some((entry: any) => {
-      if (entry.field !== 'status') return false
-      if (entry.after?.status?.toLowerCase() !== TARGET_STATUS) return false
-      const entryDate = parseInt(entry.date)
-      return entryDate >= startOfMonth && entryDate <= endOfMonth
-    })
-  } catch {
-    return false
-  }
+function isInMonth(timestamp: string | number, month: number, year: number): boolean {
+  const date = new Date(parseInt(String(timestamp)))
+  return date.getMonth() + 1 === month && date.getFullYear() === year
 }
 
 export async function POST(request: NextRequest) {
@@ -96,9 +73,7 @@ export async function POST(request: NextRequest) {
     const allTasks = await getAllTasks()
 
     const countByEditor: Record<string, number> = {}
-    for (const editor of editors) {
-      countByEditor[editor.id] = 0
-    }
+    for (const editor of editors) countByEditor[editor.id] = 0
 
     const uniqueTasks = Array.from(
       new Map(allTasks.map((t: any) => [t.id, t])).values()
@@ -113,8 +88,15 @@ export async function POST(request: NextRequest) {
       )
       if (!editor) continue
 
-      const reached = await taskReachedReviewCS(task.id, month, year)
-      if (reached) {
+      const status = task.status?.status?.toLowerCase()
+
+      // Compte si le statut actuel est "review cs"
+      // OU si la tâche a été mise à jour ce mois-ci et a eu "review cs" comme statut
+      const isReviewCS = status === 'review cs'
+      const updatedThisMonth = task.date_updated && isInMonth(task.date_updated, month, year)
+      const doneThisMonth = task.date_done && isInMonth(task.date_done, month, year)
+
+      if (isReviewCS && (updatedThisMonth || doneThisMonth)) {
         countByEditor[editor.id] = (countByEditor[editor.id] || 0) + 1
       }
     }
