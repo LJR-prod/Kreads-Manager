@@ -7,65 +7,55 @@ async function clickupFetch(url: string) {
   const res = await fetch(url, {
     headers: { 'Authorization': CLICKUP_TOKEN!, 'Content-Type': 'application/json' },
   })
-  if (!res.ok) throw new Error(`ClickUp API error: ${res.status} - ${await res.text()}`)
-  return res.json()
+  const text = await res.text()
+  if (!res.ok) throw new Error(`${res.status} - ${text}`)
+  return JSON.parse(text)
 }
 
 export async function GET() {
   try {
-    // Cherche les tâches avec statut REVIEW CS
-    let page = 0
-    let reviewCSTasks: any[] = []
+    // Récupère les tâches page 0
+    const data = await clickupFetch(
+      `https://api.clickup.com/api/v2/team/${TEAM_ID}/task?include_closed=true&subtasks=true&page=0`
+    )
+    const tasks = data.tasks || []
 
-    while (page < 5) {
-      const data = await clickupFetch(
-        `https://api.clickup.com/api/v2/team/${TEAM_ID}/task?include_closed=true&subtasks=true&page=${page}`
-      )
-      const tasks = data.tasks || []
-      if (tasks.length === 0) break
+    // Trouve une tâche avec monteur assigné
+    const taskWithMonteur = tasks.find((t: any) => {
+      const fields = t.custom_fields || []
+      const f = fields.find((f: any) => f.name?.toLowerCase().includes('monteur'))
+      return f && f.value !== null && f.value !== undefined
+    })
 
-      const matching = tasks.filter((t: any) =>
-        t.status?.status?.toLowerCase() === 'review cs'
-      )
-      reviewCSTasks = [...reviewCSTasks, ...matching]
-      if (tasks.length < 100) break
-      page++
+    if (!taskWithMonteur) {
+      return NextResponse.json({ error: 'No task with monteur found in page 0', total: tasks.length })
     }
 
-    // Prend la première tâche REVIEW CS trouvée et regarde son historique
-    const sample = reviewCSTasks.slice(0, 2)
-    const results = []
+    // Essaie différents endpoints pour l'historique
+    const taskId = taskWithMonteur.id
+    const endpoints = [
+      `https://api.clickup.com/api/v2/task/${taskId}/activity`,
+      `https://api.clickup.com/api/v2/task/${taskId}?include_subtasks=true`,
+    ]
 
-    for (const task of sample) {
-      const fields = task.custom_fields || []
-      const monteurField = fields.find((f: any) => f.name?.toLowerCase().includes('monteur'))
-      const options = monteurField?.type_config?.options || []
-      const selected = options.find((o: any) => o.orderindex === monteurField?.value)
-
-      const activityData = await clickupFetch(
-        `https://api.clickup.com/api/v2/task/${task.id}/activity`
-      )
-      const statusHistory = (activityData.history || [])
-        .filter((h: any) => h.field === 'status')
-        .map((h: any) => ({
-          date: new Date(parseInt(h.date)).toISOString(),
-          timestamp: parseInt(h.date),
-          to: h.after?.status,
-        }))
-
-      results.push({
-        taskId: task.id,
-        taskName: task.name,
-        currentStatus: task.status?.status,
-        monteurName: selected?.name || null,
-        statusHistory,
-      })
+    const endpointResults: any[] = []
+    for (const url of endpoints) {
+      try {
+        const res = await fetch(url, {
+          headers: { 'Authorization': CLICKUP_TOKEN! },
+        })
+        const text = await res.text()
+        endpointResults.push({ url, status: res.status, body: text.slice(0, 500) })
+      } catch (e: any) {
+        endpointResults.push({ url, error: e.message })
+      }
     }
 
     return NextResponse.json({
-      totalReviewCS: reviewCSTasks.length,
-      pagesScanned: page + 1,
-      results,
+      taskId,
+      taskName: taskWithMonteur.name,
+      taskStatus: taskWithMonteur.status?.status,
+      endpointResults,
     })
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 })
